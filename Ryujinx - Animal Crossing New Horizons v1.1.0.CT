@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CheatTable CheatEngineTableVersion="29">
+  <CheatEntries>
+    <CheatEntry>
+      <ID>210</ID>
+      <Description>"&lt;- ENABLE AFTER LOADING GAME"</Description>
+      <Options moHideChildren="1"/>
+      <LastState Activated="1"/>
+      <Color>0000FF</Color>
+      <VariableType>Auto Assembler Script</VariableType>
+      <AssemblerScript>{ Game   : Ryujinx - Animal Crossing New Horizon
+  Version: 
+  Date   : 2020-03-28
+  Author : CJB
+}
+
+[ENABLE]
+aobscan(base_aob,48 89 D9 49 89 D6 41 FF D0 48 89 C1 EB 32 48 89 D9 48 C1 E9 0C 49 B8 00 00 * * * * 00 00 49 8B 0C C8 49 89 C8)
+alloc(base_newmem,$1000,base_aob)
+label(base_return)
+registersymbol(base_aob)
+
+label(base)
+registersymbol(base)
+
+base_newmem:
+  mov [base],r8
+  mov rcx,[r8+rcx*8]
+  mov r8,rcx
+  jmp base_return
+base:
+  dq 0
+
+base_aob+1F:
+  jmp base_newmem
+  nop 2
+base_return:
+
+[DISABLE]
+base_aob+1F:
+  db 49 8B 0C C8 49 89 C8
+
+unregistersymbol(base)
+unregistersymbol(base_aob)
+dealloc(base_newmem)
+</AssemblerScript>
+      <CheatEntries>
+        <CheatEntry>
+          <ID>238</ID>
+          <Description>"PLAYER / ISLAND"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
+          <Color>FF0000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>240</ID>
+              <Description>"Island Name"</Description>
+              <LastState RealAddress="1CEBEFA79BC"/>
+              <VariableType>String</VariableType>
+              <Length>16</Length>
+              <Unicode>1</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>[base]+10B99B7*8</Address>
+              <Offsets>
+                <Offset>9BC</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>241</ID>
+              <Description>"Player Name"</Description>
+              <LastState RealAddress="1CEBEFA79D8"/>
+              <VariableType>String</VariableType>
+              <Length>16</Length>
+              <Unicode>1</Unicode>
+              <CodePage>0</CodePage>
+              <ZeroTerminate>1</ZeroTerminate>
+              <Address>[base]+10B99B7*8</Address>
+              <Offsets>
+                <Offset>9D8</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>246</ID>
+              <Description>"Bells Carrying"</Description>
+              <LastState Value="56000" RealAddress="1CEBEFA9178"/>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Integer</CustomType>
+              <Address>[base]+10B99B9*8</Address>
+              <Offsets>
+                <Offset>178</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>248</ID>
+              <Description>"Bells Savings"</Description>
+              <LastState Value="100058098" RealAddress="1CEBEFDC01C"/>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Integer</CustomType>
+              <Address>[base]+10B99EC*8</Address>
+              <Offsets>
+                <Offset>1C</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>236</ID>
+              <Description>"Nook Mile Points"</Description>
+              <LastState Value="985799" RealAddress="1CEBEF84970"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Integer</CustomType>
+              <Address>[base]+10B9994*8</Address>
+              <Offsets>
+                <Offset>970</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>254</ID>
+              <Description>"Held Item Durability"</Description>
+              <LastState Value="0" Activated="1" RealAddress="1CEBEF746AE"/>
+              <ShowAsSigned>0</ShowAsSigned>
+              <VariableType>Byte</VariableType>
+              <Address>[base]+10B9984*8</Address>
+              <Offsets>
+                <Offset>6AE</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>212</ID>
+          <Description>"NOOK MILES"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>FF0000</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>213</ID>
+              <Description>"You've Got the Bug"</Description>
+              <LastState Value="5000" RealAddress="1CEBEF80374"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[base]+10B9990*8</Address>
+              <Offsets>
+                <Offset>374</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>218</ID>
+              <Description>"Greedy Weeder"</Description>
+              <LastState Value="223" RealAddress="1CEBEF80404"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[base]+10B9990*8</Address>
+              <Offsets>
+                <Offset>404</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>217</ID>
+              <Description>"Rock-Splitting Champ"</Description>
+              <LastState Value="2" RealAddress="1CEBEF80454"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[base]+10B9990*8</Address>
+              <Offsets>
+                <Offset>454</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>222</ID>
+              <Description>"Bona Fide Bone Finder!"</Description>
+              <LastState Value="1" RealAddress="1CEBEF80464"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[base]+10B9990*8</Address>
+              <Offsets>
+                <Offset>464</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>223</ID>
+              <Description>"Fossil Assessment"</Description>
+              <LastState Value="30" RealAddress="1CEBEF80468"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[base]+10B9990*8</Address>
+              <Offsets>
+                <Offset>468</Offset>
+              </Offsets>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>215</ID>
+              <Description>"Active Island Resident"</Description>
+              <LastState Value="1" RealAddress="1CEBEF803A8"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[base]+10B9990*8</Address>
+              <Offsets>
+                <Offset>3A8</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+        <CheatEntry>
+          <ID>252</ID>
+          <Description>"DEBUG"</Description>
+          <Options moHideChildren="1"/>
+          <LastState Value="" RealAddress="00000000"/>
+          <Color>008080</Color>
+          <GroupHeader>1</GroupHeader>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>211</ID>
+              <Description>"base"</Description>
+              <LastState Value="0" RealAddress="1CEBE519000"/>
+              <VariableType>4 Bytes</VariableType>
+              <Address>[base]+10B8F29*8</Address>
+              <Offsets>
+                <Offset>0</Offset>
+              </Offsets>
+            </CheatEntry>
+          </CheatEntries>
+        </CheatEntry>
+      </CheatEntries>
+    </CheatEntry>
+  </CheatEntries>
+  <UserdefinedSymbols/>
+  <LuaScript>registerCustomTypeAutoAssembler([[
+alloc(ConvertRoutine,1024)
+alloc(ConvertBackRoutine,1024)
+alloc(TypeName,256)
+alloc(ByteSize,4)
+alloc(UsesFloat,1)
+alloc(CallMethod,1)
+
+TypeName:
+db 'ACNH Integer',0
+
+ByteSize:
+dd 8
+
+UsesFloat:
+db 0
+
+CallMethod:
+db 1
+
+ConvertRoutine:
+[64-bit]
+//rcx=address of input
+//rdx=address
+mov r8,rcx
+xor rax,rax
+xor rbx,rbx
+xor rcx,rcx
+xor rdx,rdx
+movzx edx,byte ptr [r8+6]
+mov cl,1D
+sub cl,dl
+mov ebx,[r8]
+mov r9,rbx
+shl rbx,cl
+mov edi,ebx
+shr rbx,20
+mov r12,rbx
+movzx ebx,word ptr [r8+4]
+mov rax,FFFFFFFF80E32B11
+sub eax,ebx
+add edi,eax
+mov eax,edi
+add eax,r12d
+ret
+
+[/64-bit]
+ConvertBackRoutine:
+[64-bit]
+//ecx=input
+//rdx=address
+//r8=address of output
+mov eax,3920
+sub rax,FFFFFFFF80E32B11
+add rax,ecx
+shl rax,9
+mov rbx,rax
+shr rax,20
+add rax,rbx
+mov r9d,eax // R9 encrypted value
+mov ebx,eax
+shr eax,8
+add bl,al
+mov eax,r9
+shr eax,10
+add bl,al
+mov eax,r9
+shr eax,18
+add bl,al
+sub bl,2d
+xor rax,rax
+mov al,bl
+shl rax,18
+add eax,00063920
+mov rbx,r9d
+shl rax,20
+add rax,rbx
+mov [r8],rax
+ret
+[/64-bit]
+]])
+</LuaScript>
+</CheatTable>

@@ -5,7 +5,7 @@
       <ID>210</ID>
       <Description>"&lt;- ENABLE AFTER LOADING GAME"</Description>
       <Options moHideChildren="1"/>
-      <LastState/>
+      <LastState Activated="1"/>
       <Color>0000FF</Color>
       <VariableType>Auto Assembler Script</VariableType>
       <AssemblerScript>{ Game   : Ryujinx - Animal Crossing New Horizon
@@ -36,6 +36,135 @@ base_aob+1F:
   nop 2
 base_return:
 
+{$lua}
+if syntaxcheck then return end
+if true then return end
+
+local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 01-10')
+for i=mr_inv.Count-1,0,-1 do
+  mr_inv.Child[i].delete()
+end
+
+for i = 1,10 do
+  local mr = AddressList.createMemoryRecord()
+  mr.description = '------- ITEM '..i..' --------'
+  mr.Type = vtWord
+  mr.Address = '[[base]+85CCDC8]+C0+8*'..string.format('%x',i-1)
+  mr.Color = 0x666666
+  mr.DropDownLinked = true
+  mr.DropDownLinkedMemrec = 'item_table'
+  mr.DropDownDescriptionOnly = true
+  mr.DisplayAsDropDownListItem = true
+  mr.appendToEntry(mr_inv)
+
+  local mr = AddressList.createMemoryRecord()
+  mr.description = 'COUNT'
+  mr.Type = vtCustom
+  mr.CustomTypeName = 'ACNH Count'
+  mr.Address = '[[base]+85CCDC8]+C4+8*'..string.format('%x',i-1)
+  mr.appendToEntry(mr_inv)
+
+  local mr = AddressList.createMemoryRecord()
+  mr.description = 'USES'
+  mr.Type = vtWord
+  mr.Address = '[[base]+85CCDC8]+C6+8*'..string.format('%x',i-1)
+  mr.appendToEntry(mr_inv)
+end
+
+local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 11-20')
+for i=mr_inv.Count-1,0,-1 do
+  mr_inv.Child[i].delete()
+end
+
+for i = 11,20 do
+  local mr = AddressList.createMemoryRecord()
+  mr.description = '------- ITEM '..i..' --------'
+  mr.Type = vtWord
+  mr.Address = '[[base]+85CCDC8]+C0+8*'..string.format('%x',i-1)
+  mr.Color = 0x666666
+  mr.DropDownLinked = true
+  mr.DropDownLinkedMemrec = 'item_table'
+  mr.DropDownDescriptionOnly = true
+  mr.DisplayAsDropDownListItem = true
+  mr.appendToEntry(mr_inv)
+
+  local mr = AddressList.createMemoryRecord()
+  mr.description = 'COUNT'
+  mr.Type = vtCustom
+  mr.CustomTypeName = 'ACNH Count'
+  mr.Address = '[[base]+85CCDC8]+C4+8*'..string.format('%x',i-1)
+  mr.appendToEntry(mr_inv)
+
+  local mr = AddressList.createMemoryRecord()
+  mr.description = 'USES'
+  mr.Type = vtWord
+  mr.Address = '[[base]+85CCDC8]+C6+8*'..string.format('%x',i-1)
+  mr.appendToEntry(mr_inv)
+end
+
+local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 21-30')
+for i=mr_inv.Count-1,0,-1 do
+  mr_inv.Child[i].delete()
+end
+
+for i = 1,10 do
+  local mr = AddressList.createMemoryRecord()
+  mr.description = '------- ITEM '..(i+20)..' --------'
+  mr.Type = vtWord
+  mr.Address = '[[base]+85CCDC8]+8+8*'..string.format('%x',i-1)
+  mr.Color = 0x666666
+  mr.DropDownLinked = true
+  mr.DropDownLinkedMemrec = 'item_table'
+  mr.DropDownDescriptionOnly = true
+  mr.DisplayAsDropDownListItem = true
+  mr.appendToEntry(mr_inv)
+
+  local mr = AddressList.createMemoryRecord()
+  mr.description = 'COUNT'
+  mr.Type = vtCustom
+  mr.CustomTypeName = 'ACNH Count'
+  mr.Address = '[[base]+85CCDC8]+C+8*'..string.format('%x',i-1)
+  mr.appendToEntry(mr_inv)
+
+  local mr = AddressList.createMemoryRecord()
+  mr.description = 'USES'
+  mr.Type = vtWord
+  mr.Address = '[[base]+85CCDC8]+E+8*'..string.format('%x',i-1)
+  mr.appendToEntry(mr_inv)
+end
+
+local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 31-40')
+for i=mr_inv.Count-1,0,-1 do
+  mr_inv.Child[i].delete()
+end
+
+for i = 11,20 do
+  local mr = AddressList.createMemoryRecord()
+  mr.description = '------- ITEM '..(i+20)..' --------'
+  mr.Type = vtWord
+  mr.Address = '[[base]+85CCDC8]+8+8*'..string.format('%x',i-1)
+  mr.Color = 0x666666
+  mr.DropDownLinked = true
+  mr.DropDownLinkedMemrec = 'item_table'
+  mr.DropDownDescriptionOnly = true
+  mr.DisplayAsDropDownListItem = true
+  mr.appendToEntry(mr_inv)
+
+  local mr = AddressList.createMemoryRecord()
+  mr.description = 'COUNT'
+  mr.Type = vtCustom
+  mr.CustomTypeName = 'ACNH Count'
+  mr.Address = '[[base]+85CCDC8]+C+8*'..string.format('%x',i-1)
+  mr.appendToEntry(mr_inv)
+
+  local mr = AddressList.createMemoryRecord()
+  mr.description = 'USES'
+  mr.Type = vtWord
+  mr.Address = '[[base]+85CCDC8]+E+8*'..string.format('%x',i-1)
+  mr.appendToEntry(mr_inv)
+end
+{$asm}
+
 [DISABLE]
 base_aob+1F:
   db 49 8B 0C C8 49 89 C8
@@ -43,6 +172,7 @@ base_aob+1F:
 unregistersymbol(base)
 unregistersymbol(base_aob)
 dealloc(base_newmem)
+
 </AssemblerScript>
       <CheatEntries>
         <CheatEntry>
@@ -56,7 +186,6 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>240</ID>
               <Description>"Island Name"</Description>
-              <LastState RealAddress="1FAB05F79BC"/>
               <VariableType>String</VariableType>
               <Length>16</Length>
               <Unicode>1</Unicode>
@@ -70,7 +199,6 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>241</ID>
               <Description>"Player Name"</Description>
-              <LastState RealAddress="1FAB05F79D8"/>
               <VariableType>String</VariableType>
               <Length>16</Length>
               <Unicode>1</Unicode>
@@ -84,7 +212,6 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>246</ID>
               <Description>"Bells Carrying"</Description>
-              <LastState Value="87860" RealAddress="1FAB05F9178"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Integer</CustomType>
               <Address>[base]+10B99B9*8</Address>
@@ -95,7 +222,6 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>248</ID>
               <Description>"Bells Savings"</Description>
-              <LastState Value="99960098" RealAddress="1FAB062C01C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Integer</CustomType>
               <Address>[base]+10B99EC*8</Address>
@@ -106,7 +232,6 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>236</ID>
               <Description>"Nook Mile Points"</Description>
-              <LastState Value="986149" RealAddress="1FAB05D4970"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Integer</CustomType>
@@ -118,7 +243,6 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>254</ID>
               <Description>"Held Item Durability"</Description>
-              <LastState Value="0" RealAddress="1FAB05C46AE"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>[base]+10B9984*8</Address>
@@ -131,222 +255,900 @@ dealloc(base_newmem)
         <CheatEntry>
           <ID>421</ID>
           <Description>"INVENTORY 01-10"</Description>
+          <Options moHideChildren="1"/>
           <LastState/>
           <Color>FF0000</Color>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
 {$lua}
 if syntaxcheck then return end
-
-local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 01-10')
-for i=mr_inv.Count-1,0,-1 do
-  mr_inv.Child[i].delete()
-end
-
-for i = 1,10 do
-  local mr = AddressList.createMemoryRecord()
-  mr.description = '------- ITEM '..i..' --------'
-  mr.Type = vtWord
-  mr.Address = '[[base]+85CCDC8]+C0+8*'..string.format('%x',i-1)
-  mr.Color = 0x666666
-  mr.DropDownLinked = true
-  mr.DropDownLinkedMemrec = 'item_table'
-  mr.DropDownDescriptionOnly = true
-  mr.DisplayAsDropDownListItem = true
-  mr.appendToEntry(mr_inv)
-
-  local mr = AddressList.createMemoryRecord()
-  mr.description = 'COUNT'
-  mr.Type = vtCustom
-  mr.CustomTypeName = 'ACNH Count'
-  mr.Address = '[[base]+85CCDC8]+C4+8*'..string.format('%x',i-1)
-  mr.appendToEntry(mr_inv)
-
-  local mr = AddressList.createMemoryRecord()
-  mr.description = 'USES'
-  mr.Type = vtWord
-  mr.Address = '[[base]+85CCDC8]+C6+8*'..string.format('%x',i-1)
-  mr.appendToEntry(mr_inv)
-end
 {$asm}
-
 
 [DISABLE]
 {$lua}
 if syntaxcheck then return end
-
-local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 01-10')
-for i=mr_inv.Count-1,0,-1 do
-  mr_inv.Child[i].delete()
-end
-
-
 </AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>646</ID>
+              <Description>"------- ITEM 1 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>647</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>648</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>649</ID>
+              <Description>"------- ITEM 2 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>650</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>651</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>652</ID>
+              <Description>"------- ITEM 3 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>653</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>654</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>655</ID>
+              <Description>"------- ITEM 4 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*3</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>656</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*3</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>657</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*3</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>658</ID>
+              <Description>"------- ITEM 5 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>659</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>660</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>661</ID>
+              <Description>"------- ITEM 6 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*5</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>662</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*5</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>663</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*5</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>664</ID>
+              <Description>"------- ITEM 7 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>665</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>666</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>667</ID>
+              <Description>"------- ITEM 8 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*7</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>668</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*7</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>669</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*7</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>670</ID>
+              <Description>"------- ITEM 9 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>671</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>672</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>673</ID>
+              <Description>"------- ITEM 10 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*9</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>674</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*9</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>675</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*9</Address>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
         <CheatEntry>
           <ID>422</ID>
           <Description>"INVENTORY 11-20"</Description>
+          <Options moHideChildren="1"/>
           <LastState/>
           <Color>FF0000</Color>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
-{$lua}
-if syntaxcheck then return end
-
-local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 11-20')
-for i=mr_inv.Count-1,0,-1 do
-  mr_inv.Child[i].delete()
-end
-
-for i = 11,20 do
-  local mr = AddressList.createMemoryRecord()
-  mr.description = '------- ITEM '..i..' --------'
-  mr.Type = vtWord
-  mr.Address = '[[base]+85CCDC8]+C0+8*'..string.format('%x',i-1)
-  mr.Color = 0x666666
-  mr.DropDownLinked = true
-  mr.DropDownLinkedMemrec = 'item_table'
-  mr.DropDownDescriptionOnly = true
-  mr.DisplayAsDropDownListItem = true
-  mr.appendToEntry(mr_inv)
-
-  local mr = AddressList.createMemoryRecord()
-  mr.description = 'COUNT'
-  mr.Type = vtCustom
-  mr.CustomTypeName = 'ACNH Count'
-  mr.Address = '[[base]+85CCDC8]+C4+8*'..string.format('%x',i-1)
-  mr.appendToEntry(mr_inv)
-
-  local mr = AddressList.createMemoryRecord()
-  mr.description = 'USES'
-  mr.Type = vtWord
-  mr.Address = '[[base]+85CCDC8]+C6+8*'..string.format('%x',i-1)
-  mr.appendToEntry(mr_inv)
-end
-{$asm}
-
-
 [DISABLE]
-{$lua}
-if syntaxcheck then return end
-
-local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 11-20')
-for i=mr_inv.Count-1,0,-1 do
-  mr_inv.Child[i].delete()
-end
-
-
 </AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>676</ID>
+              <Description>"------- ITEM 11 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>677</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>678</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>679</ID>
+              <Description>"------- ITEM 12 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>680</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>681</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>682</ID>
+              <Description>"------- ITEM 13 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>683</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>684</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>685</ID>
+              <Description>"------- ITEM 14 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*d</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>686</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*d</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>687</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*d</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>688</ID>
+              <Description>"------- ITEM 15 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>689</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>690</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>691</ID>
+              <Description>"------- ITEM 16 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*f</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>692</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*f</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>693</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*f</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>694</ID>
+              <Description>"------- ITEM 17 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>695</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>696</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>697</ID>
+              <Description>"------- ITEM 18 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*11</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>698</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*11</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>699</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*11</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>700</ID>
+              <Description>"------- ITEM 19 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*12</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>701</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*12</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>702</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*12</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>703</ID>
+              <Description>"------- ITEM 20 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C0+8*13</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>704</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C4+8*13</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>705</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+C6+8*13</Address>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
         <CheatEntry>
           <ID>423</ID>
           <Description>"INVENTORY 21-30"</Description>
+          <Options moHideChildren="1"/>
           <LastState/>
           <Color>FF0000</Color>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
-{$lua}
-if syntaxcheck then return end
-
-local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 21-30')
-for i=mr_inv.Count-1,0,-1 do
-  mr_inv.Child[i].delete()
-end
-
-for i = 1,10 do
-  local mr = AddressList.createMemoryRecord()
-  mr.description = '------- ITEM '..(i+20)..' --------'
-  mr.Type = vtWord
-  mr.Address = '[[base]+85CCDC8]+8+8*'..string.format('%x',i-1)
-  mr.Color = 0x666666
-  mr.DropDownLinked = true
-  mr.DropDownLinkedMemrec = 'item_table'
-  mr.DropDownDescriptionOnly = true
-  mr.DisplayAsDropDownListItem = true
-  mr.appendToEntry(mr_inv)
-
-  local mr = AddressList.createMemoryRecord()
-  mr.description = 'COUNT'
-  mr.Type = vtCustom
-  mr.CustomTypeName = 'ACNH Count'
-  mr.Address = '[[base]+85CCDC8]+C+8*'..string.format('%x',i-1)
-  mr.appendToEntry(mr_inv)
-
-  local mr = AddressList.createMemoryRecord()
-  mr.description = 'USES'
-  mr.Type = vtWord
-  mr.Address = '[[base]+85CCDC8]+E+8*'..string.format('%x',i-1)
-  mr.appendToEntry(mr_inv)
-end
-{$asm}
-
-
 [DISABLE]
-{$lua}
-if syntaxcheck then return end
-
-local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 21-30')
-for i=mr_inv.Count-1,0,-1 do
-  mr_inv.Child[i].delete()
-end
-
-
 </AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>706</ID>
+              <Description>"------- ITEM 21 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>707</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>708</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*0</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>709</ID>
+              <Description>"------- ITEM 22 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>710</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>711</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*1</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>712</ID>
+              <Description>"------- ITEM 23 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>713</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>714</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*2</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>715</ID>
+              <Description>"------- ITEM 24 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*3</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>716</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*3</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>717</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*3</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>718</ID>
+              <Description>"------- ITEM 25 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>719</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>720</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*4</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>721</ID>
+              <Description>"------- ITEM 26 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*5</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>722</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*5</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>723</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*5</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>724</ID>
+              <Description>"------- ITEM 27 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>725</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>726</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*6</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>727</ID>
+              <Description>"------- ITEM 28 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*7</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>728</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*7</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>729</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*7</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>730</ID>
+              <Description>"------- ITEM 29 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>731</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>732</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*8</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>733</ID>
+              <Description>"------- ITEM 30 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*9</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>734</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*9</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>735</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*9</Address>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
         <CheatEntry>
           <ID>424</ID>
           <Description>"INVENTORY 31-40"</Description>
+          <Options moHideChildren="1"/>
           <LastState/>
           <Color>FF0000</Color>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
-{$lua}
-if syntaxcheck then return end
-
-local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 31-40')
-for i=mr_inv.Count-1,0,-1 do
-  mr_inv.Child[i].delete()
-end
-
-for i = 11,20 do
-  local mr = AddressList.createMemoryRecord()
-  mr.description = '------- ITEM '..(i+20)..' --------'
-  mr.Type = vtWord
-  mr.Address = '[[base]+85CCDC8]+8+8*'..string.format('%x',i-1)
-  mr.Color = 0x666666
-  mr.DropDownLinked = true
-  mr.DropDownLinkedMemrec = 'item_table'
-  mr.DropDownDescriptionOnly = true
-  mr.DisplayAsDropDownListItem = true
-  mr.appendToEntry(mr_inv)
-
-  local mr = AddressList.createMemoryRecord()
-  mr.description = 'COUNT'
-  mr.Type = vtCustom
-  mr.CustomTypeName = 'ACNH Count'
-  mr.Address = '[[base]+85CCDC8]+C+8*'..string.format('%x',i-1)
-  mr.appendToEntry(mr_inv)
-
-  local mr = AddressList.createMemoryRecord()
-  mr.description = 'USES'
-  mr.Type = vtWord
-  mr.Address = '[[base]+85CCDC8]+E+8*'..string.format('%x',i-1)
-  mr.appendToEntry(mr_inv)
-end
-{$asm}
-
-
 [DISABLE]
-{$lua}
-if syntaxcheck then return end
-
-local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 31-40')
-for i=mr_inv.Count-1,0,-1 do
-  mr_inv.Child[i].delete()
-end
-
-
 </AssemblerScript>
+          <CheatEntries>
+            <CheatEntry>
+              <ID>736</ID>
+              <Description>"------- ITEM 31 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>737</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>738</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*a</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>739</ID>
+              <Description>"------- ITEM 32 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>740</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>741</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*b</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>742</ID>
+              <Description>"------- ITEM 33 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>743</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>744</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*c</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>745</ID>
+              <Description>"------- ITEM 34 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*d</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>746</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*d</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>747</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*d</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>748</ID>
+              <Description>"------- ITEM 35 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>749</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>750</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*e</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>751</ID>
+              <Description>"------- ITEM 36 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*f</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>752</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*f</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>753</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*f</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>754</ID>
+              <Description>"------- ITEM 37 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>755</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>756</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*10</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>757</ID>
+              <Description>"------- ITEM 38 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*11</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>758</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*11</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>759</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*11</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>760</ID>
+              <Description>"------- ITEM 39 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*12</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>761</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*12</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>762</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*12</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>763</ID>
+              <Description>"------- ITEM 40 --------"</Description>
+              <DropDownListLink>item_table</DropDownListLink>
+              <Color>666666</Color>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+8+8*13</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>764</ID>
+              <Description>"COUNT"</Description>
+              <VariableType>Custom</VariableType>
+              <CustomType>ACNH Count</CustomType>
+              <Address>[[base]+85CCDC8]+C+8*13</Address>
+            </CheatEntry>
+            <CheatEntry>
+              <ID>765</ID>
+              <Description>"USES"</Description>
+              <VariableType>2 Bytes</VariableType>
+              <Address>[[base]+85CCDC8]+E+8*13</Address>
+            </CheatEntry>
+          </CheatEntries>
         </CheatEntry>
         <CheatEntry>
           <ID>212</ID>
@@ -359,7 +1161,6 @@ end
             <CheatEntry>
               <ID>213</ID>
               <Description>"You've Got the Bug"</Description>
-              <LastState Value="5029" RealAddress="1FAB05D0374"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -369,7 +1170,6 @@ end
             <CheatEntry>
               <ID>218</ID>
               <Description>"Greedy Weeder"</Description>
-              <LastState Value="223" RealAddress="1FAB05D0404"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -379,7 +1179,6 @@ end
             <CheatEntry>
               <ID>217</ID>
               <Description>"Rock-Splitting Champ"</Description>
-              <LastState Value="10" RealAddress="1FAB05D0454"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -389,7 +1188,6 @@ end
             <CheatEntry>
               <ID>222</ID>
               <Description>"Bona Fide Bone Finder!"</Description>
-              <LastState Value="1" RealAddress="1FAB05D0464"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -399,7 +1197,6 @@ end
             <CheatEntry>
               <ID>223</ID>
               <Description>"Fossil Assessment"</Description>
-              <LastState Value="30" RealAddress="1FAB05D0468"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -409,7 +1206,6 @@ end
             <CheatEntry>
               <ID>215</ID>
               <Description>"Active Island Resident"</Description>
-              <LastState Value="1" RealAddress="1FAB05D03A8"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -429,7 +1225,6 @@ end
             <CheatEntry>
               <ID>211</ID>
               <Description>"base"</Description>
-              <LastState Value="0" RealAddress="1FAAFB69000"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B8F29*8</Address>
               <Offsets>

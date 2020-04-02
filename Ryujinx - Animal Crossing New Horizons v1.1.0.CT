@@ -15,29 +15,20 @@
 }
 
 [ENABLE]
-aobscan(base_aob,48 89 D9 49 89 D6 41 FF D0 48 89 C1 EB 32 48 89 D9 48 C1 E9 0C 49 B8 00 00 * * * * 00 00 49 8B 0C C8 49 89 C8)
-alloc(base_newmem,$1000,base_aob)
-label(base_return)
-registersymbol(base_aob)
-
-label(base)
-registersymbol(base)
-
-base_newmem:
-  mov [base],r8
-  mov rcx,[r8+rcx*8]
-  mov r8,rcx
-  jmp base_return
-base:
-  dq 0
-
-base_aob+1F:
-  jmp base_newmem
-  nop 2
-base_return:
-
 {$lua}
 if syntaxcheck then return end
+
+local ms = createMemScan()
+local AOB = '48 89 D9 49 89 D6 41 FF D0 48 89 C1 EB 32 48 89 D9 48 C1 E9 0C 49 B8 00 00 * * * * 00 00 49 8B 0C C8 49 89 C8'
+ms.OnlyOneResult = true
+ms.firstScan(soExactValue, vtByteArray, nil, AOB, nil, 0x10000000000, 0xF10000000000, '', nil, nil , true, nil, nil, nil)
+ms.waitTillDone()
+local base_ptr = ms.getOnlyResult() + 0x17
+ms.destroy()
+unregisterSymbol('base')
+registerSymbol('base',base_ptr)
+
+
 if true then return end
 
 local mr_inv = AddressList.getMemoryRecordByDescription('INVENTORY 01-10')
@@ -166,26 +157,20 @@ end
 {$asm}
 
 [DISABLE]
-base_aob+1F:
-  db 49 8B 0C C8 49 89 C8
-
-unregistersymbol(base)
-unregistersymbol(base_aob)
-dealloc(base_newmem)
-
 </AssemblerScript>
       <CheatEntries>
         <CheatEntry>
           <ID>238</ID>
           <Description>"PLAYER / ISLAND"</Description>
           <Options moHideChildren="1"/>
-          <LastState Value="" RealAddress="00000000"/>
+          <LastState Value="" Activated="1" RealAddress="00000000"/>
           <Color>FF0000</Color>
           <GroupHeader>1</GroupHeader>
           <CheatEntries>
             <CheatEntry>
               <ID>240</ID>
               <Description>"Island Name"</Description>
+              <LastState RealAddress="2001ED179BC"/>
               <VariableType>String</VariableType>
               <Length>16</Length>
               <Unicode>1</Unicode>
@@ -199,6 +184,7 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>241</ID>
               <Description>"Player Name"</Description>
+              <LastState RealAddress="2001ED179D8"/>
               <VariableType>String</VariableType>
               <Length>16</Length>
               <Unicode>1</Unicode>
@@ -212,6 +198,7 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>246</ID>
               <Description>"Bells Carrying"</Description>
+              <LastState Value="55855" RealAddress="2001ED19178"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Integer</CustomType>
               <Address>[base]+10B99B9*8</Address>
@@ -222,6 +209,7 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>248</ID>
               <Description>"Bells Savings"</Description>
+              <LastState Value="99862097" RealAddress="2001ED4C01C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Integer</CustomType>
               <Address>[base]+10B99EC*8</Address>
@@ -232,6 +220,7 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>236</ID>
               <Description>"Nook Mile Points"</Description>
+              <LastState Value="999229" RealAddress="2001ECF4970"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Integer</CustomType>
@@ -243,6 +232,7 @@ dealloc(base_newmem)
             <CheatEntry>
               <ID>254</ID>
               <Description>"Held Item Durability"</Description>
+              <LastState Value="0" RealAddress="2001ECE46AE"/>
               <ShowAsSigned>0</ShowAsSigned>
               <VariableType>Byte</VariableType>
               <Address>[base]+10B9984*8</Address>
@@ -253,9 +243,61 @@ dealloc(base_newmem)
           </CheatEntries>
         </CheatEntry>
         <CheatEntry>
+          <ID>766</ID>
+          <Description>"Infinite Base Resources"</Description>
+          <LastState Activated="1"/>
+          <Color>FF0000</Color>
+          <VariableType>Auto Assembler Script</VariableType>
+          <AssemblerScript>[ENABLE]
+{$lua}
+if syntaxcheck then return end
+
+infResourcesTimerInterval = 500
+infResourcesTimer = nil
+
+local function infResourcesTimer_tick( timer )
+  -- Keycombo to kill timer
+  if ( isKeyPressed(VK_CONTROL) and isKeyPressed(VK_SHIFT) and isKeyPressed(VK_C) ) then
+    GetLuaEngine().mOutput.Clear()
+    print( 'timer destroyed' )
+    timer.destroy()
+    return
+  end
+
+  for i = 1,20 do
+    local id = readSmallInteger('[[base]+85CCDC8]+C0+8*'..string.format('%x',i-1))
+    if id == 2767 or id == 2768 or id == 2769 or id == 2500 or id == 3090 or id == 2511 or id == 2502 then
+      writeBytes('[[base]+85CCDC8]+C4+8*'..string.format('%x',i-1),24)
+    end
+  end
+
+  for i = 1,20 do
+    local id = readSmallInteger('[[base]+85CCDC8]+8+8*'..string.format('%x',i-1))
+    if id == 2767 or id == 2768 or id == 2769 or id == 2500 or id == 3090 or id == 2511 or id == 2502 then
+      writeBytes('[[base]+85CCDC8]+C+8*'..string.format('%x',i-1),24)
+    end
+  end
+end
+
+
+infResourcesTimer = createTimer(MainForm)
+infResourcesTimer.Interval = infResourcesTimerInterval
+infResourcesTimer.OnTimer = infResourcesTimer_tick
+
+
+{$asm}
+
+[DISABLE]
+{$lua}
+if syntaxcheck then return end
+
+infResourcesTimer.destroy()
+</AssemblerScript>
+        </CheatEntry>
+        <CheatEntry>
           <ID>421</ID>
           <Description>"INVENTORY 01-10"</Description>
-          <Options moHideChildren="1"/>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
           <LastState/>
           <Color>FF0000</Color>
           <VariableType>Auto Assembler Script</VariableType>
@@ -273,6 +315,7 @@ if syntaxcheck then return end
               <ID>646</ID>
               <Description>"------- ITEM 1 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="4703" RealAddress="2001ED190C0"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*0</Address>
@@ -280,6 +323,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>647</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190C4"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*0</Address>
@@ -287,6 +331,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>648</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED190C6"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*0</Address>
             </CheatEntry>
@@ -294,6 +339,7 @@ if syntaxcheck then return end
               <ID>649</ID>
               <Description>"------- ITEM 2 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="8179" RealAddress="2001ED190C8"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*1</Address>
@@ -301,6 +347,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>650</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190CC"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*1</Address>
@@ -308,6 +355,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>651</ID>
               <Description>"USES"</Description>
+              <LastState Value="5" RealAddress="2001ED190CE"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*1</Address>
             </CheatEntry>
@@ -315,6 +363,7 @@ if syntaxcheck then return end
               <ID>652</ID>
               <Description>"------- ITEM 3 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="8660" RealAddress="2001ED190D0"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*2</Address>
@@ -322,6 +371,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>653</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190D4"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*2</Address>
@@ -329,6 +379,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>654</ID>
               <Description>"USES"</Description>
+              <LastState Value="2" RealAddress="2001ED190D6"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*2</Address>
             </CheatEntry>
@@ -336,6 +387,7 @@ if syntaxcheck then return end
               <ID>655</ID>
               <Description>"------- ITEM 4 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="8574" RealAddress="2001ED190D8"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*3</Address>
@@ -343,6 +395,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>656</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190DC"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*3</Address>
@@ -350,6 +403,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>657</ID>
               <Description>"USES"</Description>
+              <LastState Value="30" RealAddress="2001ED190DE"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*3</Address>
             </CheatEntry>
@@ -357,6 +411,7 @@ if syntaxcheck then return end
               <ID>658</ID>
               <Description>"------- ITEM 5 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="9617" RealAddress="2001ED190E0"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*4</Address>
@@ -364,6 +419,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>659</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190E4"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*4</Address>
@@ -371,6 +427,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>660</ID>
               <Description>"USES"</Description>
+              <LastState Value="6" RealAddress="2001ED190E6"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*4</Address>
             </CheatEntry>
@@ -378,6 +435,7 @@ if syntaxcheck then return end
               <ID>661</ID>
               <Description>"------- ITEM 6 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="8578" RealAddress="2001ED190E8"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*5</Address>
@@ -385,6 +443,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>662</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190EC"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*5</Address>
@@ -392,6 +451,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>663</ID>
               <Description>"USES"</Description>
+              <LastState Value="2" RealAddress="2001ED190EE"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*5</Address>
             </CheatEntry>
@@ -399,6 +459,7 @@ if syntaxcheck then return end
               <ID>664</ID>
               <Description>"------- ITEM 7 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="8533" RealAddress="2001ED190F0"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*6</Address>
@@ -406,6 +467,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>665</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190F4"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*6</Address>
@@ -413,6 +475,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>666</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED190F6"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*6</Address>
             </CheatEntry>
@@ -420,6 +483,7 @@ if syntaxcheck then return end
               <ID>667</ID>
               <Description>"------- ITEM 8 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2615" RealAddress="2001ED190F8"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*7</Address>
@@ -427,6 +491,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>668</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190FC"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*7</Address>
@@ -434,6 +499,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>669</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED190FE"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*7</Address>
             </CheatEntry>
@@ -441,6 +507,7 @@ if syntaxcheck then return end
               <ID>670</ID>
               <Description>"------- ITEM 9 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2767" RealAddress="2001ED19100"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*8</Address>
@@ -448,6 +515,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>671</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="25" RealAddress="2001ED19104"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*8</Address>
@@ -455,6 +523,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>672</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19106"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*8</Address>
             </CheatEntry>
@@ -462,6 +531,7 @@ if syntaxcheck then return end
               <ID>673</ID>
               <Description>"------- ITEM 10 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2769" RealAddress="2001ED19108"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*9</Address>
@@ -469,6 +539,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>674</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="25" RealAddress="2001ED1910C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*9</Address>
@@ -476,6 +547,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>675</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1910E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*9</Address>
             </CheatEntry>
@@ -484,7 +556,7 @@ if syntaxcheck then return end
         <CheatEntry>
           <ID>422</ID>
           <Description>"INVENTORY 11-20"</Description>
-          <Options moHideChildren="1"/>
+          <Options moHideChildren="1" moDeactivateChildrenAsWell="1"/>
           <LastState/>
           <Color>FF0000</Color>
           <VariableType>Auto Assembler Script</VariableType>
@@ -496,6 +568,7 @@ if syntaxcheck then return end
               <ID>676</ID>
               <Description>"------- ITEM 11 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2768" RealAddress="2001ED19110"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*a</Address>
@@ -503,6 +576,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>677</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="25" RealAddress="2001ED19114"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*a</Address>
@@ -510,6 +584,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>678</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19116"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*a</Address>
             </CheatEntry>
@@ -517,6 +592,7 @@ if syntaxcheck then return end
               <ID>679</ID>
               <Description>"------- ITEM 12 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2777" RealAddress="2001ED19118"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*b</Address>
@@ -524,6 +600,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>680</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="5" RealAddress="2001ED1911C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*b</Address>
@@ -531,6 +608,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>681</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1911E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*b</Address>
             </CheatEntry>
@@ -538,6 +616,7 @@ if syntaxcheck then return end
               <ID>682</ID>
               <Description>"------- ITEM 13 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2500" RealAddress="2001ED19120"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*c</Address>
@@ -545,6 +624,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>683</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="25" RealAddress="2001ED19124"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*c</Address>
@@ -552,6 +632,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>684</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19126"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*c</Address>
             </CheatEntry>
@@ -559,6 +640,7 @@ if syntaxcheck then return end
               <ID>685</ID>
               <Description>"------- ITEM 14 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="3090" RealAddress="2001ED19128"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*d</Address>
@@ -566,6 +648,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>686</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="25" RealAddress="2001ED1912C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*d</Address>
@@ -573,6 +656,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>687</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1912E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*d</Address>
             </CheatEntry>
@@ -580,6 +664,7 @@ if syntaxcheck then return end
               <ID>688</ID>
               <Description>"------- ITEM 15 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2511" RealAddress="2001ED19130"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*e</Address>
@@ -587,6 +672,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>689</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="25" RealAddress="2001ED19134"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*e</Address>
@@ -594,6 +680,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>690</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19136"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*e</Address>
             </CheatEntry>
@@ -601,6 +688,7 @@ if syntaxcheck then return end
               <ID>691</ID>
               <Description>"------- ITEM 16 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2502" RealAddress="2001ED19138"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*f</Address>
@@ -608,6 +696,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>692</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="25" RealAddress="2001ED1913C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*f</Address>
@@ -615,6 +704,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>693</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1913E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*f</Address>
             </CheatEntry>
@@ -622,6 +712,7 @@ if syntaxcheck then return end
               <ID>694</ID>
               <Description>"------- ITEM 17 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2624" RealAddress="2001ED19140"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*10</Address>
@@ -629,6 +720,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>695</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="78" RealAddress="2001ED19144"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*10</Address>
@@ -636,6 +728,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>696</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19146"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*10</Address>
             </CheatEntry>
@@ -643,6 +736,7 @@ if syntaxcheck then return end
               <ID>697</ID>
               <Description>"------- ITEM 18 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="5851" RealAddress="2001ED19148"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*11</Address>
@@ -650,6 +744,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>698</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="9" RealAddress="2001ED1914C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*11</Address>
@@ -657,6 +752,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>699</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1914E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*11</Address>
             </CheatEntry>
@@ -664,6 +760,7 @@ if syntaxcheck then return end
               <ID>700</ID>
               <Description>"------- ITEM 19 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2286" RealAddress="2001ED19150"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*12</Address>
@@ -671,6 +768,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>701</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="8" RealAddress="2001ED19154"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*12</Address>
@@ -678,6 +776,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>702</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19156"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*12</Address>
             </CheatEntry>
@@ -685,6 +784,7 @@ if syntaxcheck then return end
               <ID>703</ID>
               <Description>"------- ITEM 20 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2286" RealAddress="2001ED19158"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C0+8*13</Address>
@@ -692,6 +792,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>704</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="10" RealAddress="2001ED1915C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C4+8*13</Address>
@@ -699,6 +800,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>705</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1915E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+C6+8*13</Address>
             </CheatEntry>
@@ -708,7 +810,7 @@ if syntaxcheck then return end
           <ID>423</ID>
           <Description>"INVENTORY 21-30"</Description>
           <Options moHideChildren="1"/>
-          <LastState/>
+          <LastState Activated="1"/>
           <Color>FF0000</Color>
           <VariableType>Auto Assembler Script</VariableType>
           <AssemblerScript>[ENABLE]
@@ -719,6 +821,7 @@ if syntaxcheck then return end
               <ID>706</ID>
               <Description>"------- ITEM 21 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="1852" RealAddress="2001ED19008"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*0</Address>
@@ -726,6 +829,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>707</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="3" RealAddress="2001ED1900C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*0</Address>
@@ -733,6 +837,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>708</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1900E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*0</Address>
             </CheatEntry>
@@ -740,6 +845,7 @@ if syntaxcheck then return end
               <ID>709</ID>
               <Description>"------- ITEM 22 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19010"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*1</Address>
@@ -747,6 +853,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>710</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED19014"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*1</Address>
@@ -754,6 +861,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>711</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19016"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*1</Address>
             </CheatEntry>
@@ -761,6 +869,7 @@ if syntaxcheck then return end
               <ID>712</ID>
               <Description>"------- ITEM 23 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2287" RealAddress="2001ED19018"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*2</Address>
@@ -768,6 +877,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>713</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="9" RealAddress="2001ED1901C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*2</Address>
@@ -775,6 +885,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>714</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1901E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*2</Address>
             </CheatEntry>
@@ -782,6 +893,7 @@ if syntaxcheck then return end
               <ID>715</ID>
               <Description>"------- ITEM 24 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19020"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*3</Address>
@@ -789,6 +901,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>716</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED19024"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*3</Address>
@@ -796,6 +909,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>717</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19026"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*3</Address>
             </CheatEntry>
@@ -803,6 +917,7 @@ if syntaxcheck then return end
               <ID>718</ID>
               <Description>"------- ITEM 25 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19028"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*4</Address>
@@ -810,6 +925,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>719</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED1902C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*4</Address>
@@ -817,6 +933,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>720</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1902E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*4</Address>
             </CheatEntry>
@@ -824,6 +941,7 @@ if syntaxcheck then return end
               <ID>721</ID>
               <Description>"------- ITEM 26 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19030"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*5</Address>
@@ -831,6 +949,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>722</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED19034"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*5</Address>
@@ -838,6 +957,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>723</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19036"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*5</Address>
             </CheatEntry>
@@ -845,6 +965,7 @@ if syntaxcheck then return end
               <ID>724</ID>
               <Description>"------- ITEM 27 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19038"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*6</Address>
@@ -852,6 +973,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>725</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED1903C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*6</Address>
@@ -859,6 +981,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>726</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1903E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*6</Address>
             </CheatEntry>
@@ -866,6 +989,7 @@ if syntaxcheck then return end
               <ID>727</ID>
               <Description>"------- ITEM 28 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19040"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*7</Address>
@@ -873,6 +997,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>728</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED19044"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*7</Address>
@@ -880,6 +1005,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>729</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19046"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*7</Address>
             </CheatEntry>
@@ -887,6 +1013,7 @@ if syntaxcheck then return end
               <ID>730</ID>
               <Description>"------- ITEM 29 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19048"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*8</Address>
@@ -894,6 +1021,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>731</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED1904C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*8</Address>
@@ -901,6 +1029,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>732</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1904E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*8</Address>
             </CheatEntry>
@@ -908,6 +1037,7 @@ if syntaxcheck then return end
               <ID>733</ID>
               <Description>"------- ITEM 30 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="2579" RealAddress="2001ED19050"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*9</Address>
@@ -915,6 +1045,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>734</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="190" RealAddress="2001ED19054"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*9</Address>
@@ -922,6 +1053,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>735</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19056"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*9</Address>
             </CheatEntry>
@@ -942,6 +1074,7 @@ if syntaxcheck then return end
               <ID>736</ID>
               <Description>"------- ITEM 31 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19058"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*a</Address>
@@ -949,6 +1082,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>737</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED1905C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*a</Address>
@@ -956,6 +1090,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>738</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1905E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*a</Address>
             </CheatEntry>
@@ -963,6 +1098,7 @@ if syntaxcheck then return end
               <ID>739</ID>
               <Description>"------- ITEM 32 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19060"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*b</Address>
@@ -970,6 +1106,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>740</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED19064"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*b</Address>
@@ -977,6 +1114,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>741</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19066"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*b</Address>
             </CheatEntry>
@@ -984,6 +1122,7 @@ if syntaxcheck then return end
               <ID>742</ID>
               <Description>"------- ITEM 33 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19068"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*c</Address>
@@ -991,6 +1130,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>743</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED1906C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*c</Address>
@@ -998,6 +1138,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>744</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1906E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*c</Address>
             </CheatEntry>
@@ -1005,6 +1146,7 @@ if syntaxcheck then return end
               <ID>745</ID>
               <Description>"------- ITEM 34 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19070"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*d</Address>
@@ -1012,6 +1154,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>746</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED19074"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*d</Address>
@@ -1019,6 +1162,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>747</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19076"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*d</Address>
             </CheatEntry>
@@ -1026,6 +1170,7 @@ if syntaxcheck then return end
               <ID>748</ID>
               <Description>"------- ITEM 35 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19078"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*e</Address>
@@ -1033,6 +1178,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>749</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED1907C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*e</Address>
@@ -1040,6 +1186,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>750</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1907E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*e</Address>
             </CheatEntry>
@@ -1047,6 +1194,7 @@ if syntaxcheck then return end
               <ID>751</ID>
               <Description>"------- ITEM 36 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19080"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*f</Address>
@@ -1054,6 +1202,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>752</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED19084"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*f</Address>
@@ -1061,6 +1210,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>753</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19086"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*f</Address>
             </CheatEntry>
@@ -1068,6 +1218,7 @@ if syntaxcheck then return end
               <ID>754</ID>
               <Description>"------- ITEM 37 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19088"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*10</Address>
@@ -1075,6 +1226,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>755</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED1908C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*10</Address>
@@ -1082,6 +1234,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>756</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1908E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*10</Address>
             </CheatEntry>
@@ -1089,6 +1242,7 @@ if syntaxcheck then return end
               <ID>757</ID>
               <Description>"------- ITEM 38 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19090"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*11</Address>
@@ -1096,6 +1250,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>758</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED19094"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*11</Address>
@@ -1103,6 +1258,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>759</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED19096"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*11</Address>
             </CheatEntry>
@@ -1110,6 +1266,7 @@ if syntaxcheck then return end
               <ID>760</ID>
               <Description>"------- ITEM 39 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED19098"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*12</Address>
@@ -1117,6 +1274,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>761</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED1909C"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*12</Address>
@@ -1124,6 +1282,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>762</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED1909E"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*12</Address>
             </CheatEntry>
@@ -1131,6 +1290,7 @@ if syntaxcheck then return end
               <ID>763</ID>
               <Description>"------- ITEM 40 --------"</Description>
               <DropDownListLink>item_table</DropDownListLink>
+              <LastState Value="65534" RealAddress="2001ED190A0"/>
               <Color>666666</Color>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+8+8*13</Address>
@@ -1138,6 +1298,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>764</ID>
               <Description>"COUNT"</Description>
+              <LastState Value="1" RealAddress="2001ED190A4"/>
               <VariableType>Custom</VariableType>
               <CustomType>ACNH Count</CustomType>
               <Address>[[base]+85CCDC8]+C+8*13</Address>
@@ -1145,6 +1306,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>765</ID>
               <Description>"USES"</Description>
+              <LastState Value="0" RealAddress="2001ED190A6"/>
               <VariableType>2 Bytes</VariableType>
               <Address>[[base]+85CCDC8]+E+8*13</Address>
             </CheatEntry>
@@ -1161,6 +1323,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>213</ID>
               <Description>"You've Got the Bug"</Description>
+              <LastState Value="5033" RealAddress="2001ECF0374"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -1170,6 +1333,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>218</ID>
               <Description>"Greedy Weeder"</Description>
+              <LastState Value="223" RealAddress="2001ECF0404"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -1179,6 +1343,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>217</ID>
               <Description>"Rock-Splitting Champ"</Description>
+              <LastState Value="13" RealAddress="2001ECF0454"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -1188,6 +1353,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>222</ID>
               <Description>"Bona Fide Bone Finder!"</Description>
+              <LastState Value="1" RealAddress="2001ECF0464"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -1197,6 +1363,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>223</ID>
               <Description>"Fossil Assessment"</Description>
+              <LastState Value="32" RealAddress="2001ECF0468"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -1206,6 +1373,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>215</ID>
               <Description>"Active Island Resident"</Description>
+              <LastState Value="1" RealAddress="2001ECF03A8"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B9990*8</Address>
               <Offsets>
@@ -1225,6 +1393,7 @@ if syntaxcheck then return end
             <CheatEntry>
               <ID>211</ID>
               <Description>"base"</Description>
+              <LastState Value="0" RealAddress="2001E289000"/>
               <VariableType>4 Bytes</VariableType>
               <Address>[base]+10B8F29*8</Address>
               <Offsets>
@@ -9381,7 +9550,12 @@ if syntaxcheck then return end
       </CheatEntries>
     </CheatEntry>
   </CheatEntries>
-  <UserdefinedSymbols/>
+  <UserdefinedSymbols>
+    <SymbolEntry>
+      <Name>base</Name>
+      <Address>200FFBC712E</Address>
+    </SymbolEntry>
+  </UserdefinedSymbols>
   <LuaScript>local PROCESS_NAME = 'Ryujinx.exe'
 
 local function cycleFullCompact(sender,force)

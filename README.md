@@ -9,7 +9,7 @@ Modifiable values:
 - Nook Miles Points
 - Held Item Durability
 - Food Eaten
-- Edit Player Inventory
+- Edit Player Inventory (Over 8000 selectable items)
 
 # Ryujinx - Animal Crossing New Horizons v1.0.0
 Modifyable values:

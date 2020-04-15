@@ -1,4 +1,4 @@
-# Ryujinx - Animal Crossing New Horizons v1.1.0 / v1.1.1 / v1.1.2 / v1.1.3 / v1.1.4
+# Yuzu / Ryujinx - Animal Crossing New Horizons v1.1.0 / v1.1.1 / v1.1.2 / v1.1.3 / v1.1.4
 Cheats:
 - Infinite Resources (Keeps the amount at 25 for Stone, Clay, Iron, Wood, Softwood, Hardwood, Branches)
 

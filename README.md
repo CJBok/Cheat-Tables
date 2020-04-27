@@ -1,4 +1,4 @@
-# Yuzu - Animal Crossing New Horizons v1.2.0
+# Ryujinx / Yuzu - Animal Crossing New Horizons v1.2.0
 Cheats:
 - Infinite Bells
 - Unbreakable Tools

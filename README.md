@@ -4,6 +4,8 @@ Cheats:
 - Unbreakable Tools
 - Infinite Resources (Keeps the amount at 99 for Stone, Clay, Iron, Wood, Softwood, Hardwood, Branches)
 - Increased Stack Sizes (Increases stackable items to max stack size 200)
+- Infinite Food (Hotkey Toggle: NUMPAD. + NUMPAD1)
+- Activate Island Designer (Hotkey Enable: NUMPAD. + NUMPAD+ | Hotkey Disable: NUMPAD. + NUMPAD-)
 
 Modifiable values:
 - Player Name
